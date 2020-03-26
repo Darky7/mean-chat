@@ -16,29 +16,34 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   newUser = { nickname: '', room: '' };
   msgData = { room: '', nickname: '', message: '' };
   socket = io('http://localhost:4000');
+  public chatAll: Array<String> = [];
+  roomNameD: string
+  roomNameM: string
+  roomNameMo: string
 
-  constructor(private chatService: ChatService) {}
+
+  constructor(private chatService: ChatService) { }
 
   ngOnInit() {
     var user = JSON.parse(localStorage.getItem("user"));
-    if(user!==null) {
+    if (user !== null) {
       this.getChatByRoom(user.room);
-      this.msgData = { 
-				room: user.room, 
-				nickname: user.nickname, 
-				message: '' 
-			};
+      this.msgData = {
+        room: user.room,
+        nickname: user.nickname,
+        message: ''
+      };
       this.joined = true;
       this.scrollToBottom();
     }
     this.socket.on('new-message', function (data) {
-      if(data.message.room === JSON.parse(localStorage.getItem("user")).room) {
+      if (data.message.room === JSON.parse(localStorage.getItem("user")).room) {
         this.chats.push(data.message);
-        this.msgData = { 
-					room: user.room, 
-					nickname: user.nickname, 
-					message: '' 
-				};
+        this.msgData = {
+          room: user.room,
+          nickname: user.nickname,
+          message: ''
+        };
         this.scrollToBottom();
       }
     }.bind(this));
@@ -50,9 +55,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   scrollToBottom(): void {
     try {
-      this.myScrollContainer.nativeElement.scrollTop = 
-				this.myScrollContainer.nativeElement.scrollHeight;
-    } catch(err) { }
+      this.myScrollContainer.nativeElement.scrollTop =
+        this.myScrollContainer.nativeElement.scrollHeight;
+    } catch (err) { }
   }
 
   getChatByRoom(room) {
@@ -67,19 +72,39 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     var date = new Date();
     localStorage.setItem("user", JSON.stringify(this.newUser));
     this.getChatByRoom(this.newUser.room);
-    this.msgData = { 
-			room: this.newUser.room, 
-			nickname: this.newUser.nickname, 
-			message: '' 
-		};
+    this.msgData = {
+      room: this.newUser.room,
+      nickname: this.newUser.nickname,
+      message: ''
+    };
+    //add chatroom
+    if (this.chatAll.indexOf(this.newUser.room) !== -1) {
+      console.log("Exist")
+    } else {
+      this.chatAll.push(this.newUser.room);
+    }
+    console.log(this.chatAll)
     this.joined = true;
-    this.socket.emit('save-message', { 
-			room: this.newUser.room, 
-			nickname: this.newUser.nickname, 
-			message: 'Join this room', 
-			updated_at: date 
-		});
+    this.socket.emit('save-message', {
+      room: this.newUser.room,
+      nickname: this.newUser.nickname,
+      message: 'Join this room',
+      updated_at: date
+    });
   }
+
+  deleteRoom() {
+    console.log(this.roomNameD)
+    this.chatAll = this.chatAll.filter(e => e !== this.roomNameD);
+    console.log("Delete")
+  }
+  modifyRoom(){
+    console.log(this.roomNameM)
+    this.chatAll = this.chatAll.filter(e => e !== this.roomNameM);
+    this.chatAll.push(this.roomNameMo);
+    console.log("Modify")
+  }
+
 
   sendMessage() {
     this.chatService.saveChat(this.msgData).then((result) => {
@@ -92,31 +117,14 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   logout() {
     var date = new Date();
     var user = JSON.parse(localStorage.getItem("user"));
-    this.socket.emit('save-message', { 
-			room: user.room, 
-			nickname: user.nickname, 
-			message: 'Left this room', 
-			updated_at: date 
-		});
+    this.socket.emit('save-message', {
+      room: user.room,
+      nickname: user.nickname,
+      message: 'Left this room',
+      updated_at: date
+    });
     localStorage.removeItem("user");
     this.joined = false;
   }
 
 }
-/*
-import { Component, OnInit } from '@angular/core';
-
-@Component({
-  selector: 'app-chat',
-  templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css']
-})
-export class ChatComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-}
-*/
