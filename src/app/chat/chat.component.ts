@@ -84,6 +84,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       this.chatAll.push(this.newUser.room);
     }
     console.log(this.chatAll)
+    localStorage.setItem("tmp", JSON.stringify(this.chatAll));
+    this.chatAll = JSON.parse(localStorage.getItem("tmp"));
     this.joined = true;
     this.socket.emit('save-message', {
       room: this.newUser.room,
@@ -97,12 +99,16 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     console.log(this.roomNameD)
     this.chatAll = this.chatAll.filter(e => e !== this.roomNameD);
     console.log("Delete")
+    localStorage.setItem("tmp", JSON.stringify(this.chatAll));
+    this.chatAll = JSON.parse(localStorage.getItem("tmp"));
   }
   modifyRoom(){
     console.log(this.roomNameM)
     this.chatAll = this.chatAll.filter(e => e !== this.roomNameM);
     this.chatAll.push(this.roomNameMo);
     console.log("Modify")
+    localStorage.setItem("tmp", JSON.stringify(this.chatAll));
+    this.chatAll = JSON.parse(localStorage.getItem("tmp"));
   }
 
 
