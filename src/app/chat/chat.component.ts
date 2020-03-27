@@ -24,7 +24,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   constructor(private chatService: ChatService) { }
 
-  ngOnInit() {
+  ngOnInit() {        
     var user = JSON.parse(localStorage.getItem("user"));
     if (user !== null) {
       this.getChatByRoom(user.room);
@@ -92,12 +92,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       nickname: this.newUser.nickname,
       message: 'Join this room',
       updated_at: date
-    });
+    });    
   }
 
   deleteRoom() {
     console.log(this.roomNameD)
     this.chatAll = this.chatAll.filter(e => e !== this.roomNameD);
+    this.chatService.deleteChatRoom(this.roomNameD)
     console.log("Delete")
     localStorage.setItem("tmp", JSON.stringify(this.chatAll));
     this.chatAll = JSON.parse(localStorage.getItem("tmp"));
@@ -109,7 +110,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     console.log("Modify")
     localStorage.setItem("tmp", JSON.stringify(this.chatAll));
     this.chatAll = JSON.parse(localStorage.getItem("tmp"));
-  }
+    // update in database
+    this.chatService.updateChatByRoom(this.newUser.room, this.roomNameMo);  }
 
 
   sendMessage() {

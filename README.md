@@ -20,4 +20,3 @@ However, when you change the angular, you have to do an `ng build`.
 To use the chat, open two browsers at:
 
 http://localhost:9000/
-
